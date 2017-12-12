@@ -1,0 +1,54 @@
+﻿@model IEnumerable<WebApplication2.Models.PLocation>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @if (User.Identity.IsAuthenticated)
+    {
+    @Html.ActionLink("Create New", "Create")
+    }
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.City)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Country)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ProvinceOrState)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.City)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Country)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ProvinceOrState)
+        </td>
+        <td>
+             @if (User.Identity.IsAuthenticated) {
+                @Html.ActionLink("Edit", "Edit", new { id = item.LocationID}) 
+            }
+            @Html.ActionLink("Details", "Details", new { id = item.LocationID}) |
+            @if (User.Identity.IsAuthenticated)
+            {
+                @Html.ActionLink("Delete", "Delete", new { id = item.LocationID })
+            }
+        </td>
+    </tr>
+}
+
+</table>

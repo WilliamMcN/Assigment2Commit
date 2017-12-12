@@ -1,0 +1,61 @@
+﻿@model IEnumerable<WebApplication2.Models.Party>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @if (User.Identity.IsAuthenticated)
+    {
+    @Html.ActionLink("Create New", "Create")
+    }
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Message_)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Party_Type_)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Address_)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PLocation.City)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Message_)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Party_Type_)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Address_)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PLocation.City)
+        </td>
+        <td>
+            @if (User.Identity.IsAuthenticated) {
+                @Html.ActionLink("Edit", "Edit", new { id = item.PartyId }) 
+            }
+            @Html.ActionLink("Details", "Details", new { id = item.PartyId}) |
+            @if (User.Identity.IsAuthenticated)
+            {
+                @Html.ActionLink("Delete", "Delete", new { id = item.PartyId })
+            }
+
+        </td>
+    </tr>
+}
+
+</table>
