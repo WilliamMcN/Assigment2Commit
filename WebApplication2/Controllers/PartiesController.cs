@@ -12,10 +12,25 @@ namespace WebApplication2.Controllers
 {
     public class PartiesController : Controller
     {
-        private Comp2007Sept28_Ass2Entities db = new Comp2007Sept28_Ass2Entities();
+        private IStoreManagerRepository db;
+
+        // if no param passed to constructor, use EF Repository & DbContext
+        public PartiesController()
+        {
+            this.db = new EFStoreManagerRepository();
+        }
+
+        // if mock repo object passed to constructor, use Mock interface for unit testing
+        public PartiesController(IStoreManagerRepository smRepo)
+        {
+            this.db = smRepo;
+        }
+
+
+        //private Comp2007Sept28_Ass2Entities db = new Comp2007Sept28_Ass2Entities();
 
         // GET: Parties
-        public ActionResult Index()
+        public ViewResult Index()
         {
             var parties = db.Parties.Include(p => p.PLocation);
             return View(parties.ToList());
@@ -23,16 +38,17 @@ namespace WebApplication2.Controllers
 
         // GET: Parties/Details/5
         [Authorize]
-        public ActionResult Details(int? id)
+        public ViewResult Details(int? id)
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return View("Error");
             }
-            Party party = db.Parties.Find(id);
+            //Party party = db.Parties.Find(id);
+            Party party = db.Parties.SingleOrDefault(a => a.PartyId == id);
             if (party == null)
             {
-                return HttpNotFound();
+                return View("Error");
             }
             return View(party);
         }
@@ -41,8 +57,8 @@ namespace WebApplication2.Controllers
         [Authorize]
         public ActionResult Create()
         {
-            ViewBag.LocationID = new SelectList(db.PLocations, "LocationID", "City");
-            return View();
+            ViewBag.LocationID = new SelectList(db.Plocation, "LocationID", "City");
+            return View("Create");
         }
 
         // POST: Parties/Create
@@ -54,30 +70,30 @@ namespace WebApplication2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Parties.Add(party);
-                db.SaveChanges();
+                db.Save(party);
                 return RedirectToAction("Index");
             }
 
-            ViewBag.LocationID = new SelectList(db.PLocations, "LocationID", "City", party.LocationID);
-            return View(party);
+            ViewBag.LocationID = new SelectList(db.Plocation, "LocationID", "City", party.LocationID);
+            return View("Create",party);
         }
 
         // GET: Parties/Edit/5
         [Authorize]
-        public ActionResult Edit(int? id)
+        public ViewResult Edit(int? id)
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                 return View("Error");
             }
-            Party party = db.Parties.Find(id);
+            //Party party = db.Parties.Find(id);
+            Party party = db.Parties.SingleOrDefault(a => a.PartyId == id);
             if (party == null)
             {
-                return HttpNotFound();
+                return View("Error");
             }
-            ViewBag.LocationID = new SelectList(db.PLocations, "LocationID", "City", party.LocationID);
-            return View(party);
+            ViewBag.LocationID = new SelectList(db.Plocation, "LocationID", "City", party.LocationID);
+            return View("Edit",party);
         }
 
         // POST: Parties/Edit/5
@@ -89,49 +105,59 @@ namespace WebApplication2.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(party).State = EntityState.Modified;
-                db.SaveChanges();
+                db.Save(party);
                 return RedirectToAction("Index");
             }
-            ViewBag.LocationID = new SelectList(db.PLocations, "LocationID", "City", party.LocationID);
-            return View(party);
+            ViewBag.LocationID = new SelectList(db.Plocation, "LocationID", "City", party.LocationID);
+            return View("Edit",party);
         }
 
         // GET: Parties/Delete/5
         [Authorize]
-        public ActionResult Delete(int? id)
+        public ViewResult Delete(int? id)
         {
             if (id == null)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return View("Error");
             }
-            Party party = db.Parties.Find(id);
+            //Party party = db.Parties.Find(id);
+            Party party = db.Parties.SingleOrDefault(a => a.PartyId == id);
             if (party == null)
             {
-                return HttpNotFound();
+                return View("Error");
             }
-            return View(party);
+            return View("Delete",party);
         }
 
         // POST: Parties/Delete/5
         [Authorize]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult DeleteConfirmed(int? id)
         {
-            Party party = db.Parties.Find(id);
-            db.Parties.Remove(party);
-            db.SaveChanges();
+            if (id == null)
+            {
+                return View("Error");
+            }
+            Party party = db.Parties.SingleOrDefault(a => a.PartyId == id);
+            if (party == null)
+            {
+                return View("Error");
+            }
+
+            db.Delete(party);
+
             return RedirectToAction("Index");
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        //protected override void Dispose(bool disposing)
+        //{
+        //    if (disposing)
+        //    {
+        //        db.Dispose();
+        //    }
+        //    base.Dispose(disposing);
+        //}
+
     }
 }
